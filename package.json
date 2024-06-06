@@ -1,0 +1,25 @@
+{
+  "name": "autojobbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.7.2",
+    "chromedriver": "^125.0.3",
+    "circular-json": "^0.5.9",
+    "express": "^4.19.2",
+    "flatted": "^3.3.1",
+    "path": "^0.12.7",
+    "selenium-webdriver": "^4.21.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nock": "^13.5.4"
+  }
+}
