@@ -11,9 +11,9 @@ function writePostContent(jobPost) {
     const postDay = jobPost.postDate.getUTCDate();
 
     const postContent = `
-📢 Don't Miss Out on This Must-Apply Internship/Job Opportunity! 📢
+📢 ${jobPost.company} Just released its ${jobPost.jobTitle} role 📢
 
-${jobPost.company} released its ${jobPost.jobTitle} role.
+You Can't Miss Out on This Must-Apply Internship/Job Opportunity!
 
 Something to know about
 1. The role is based in ${jobPost.jobLocation}.
@@ -24,7 +24,7 @@ Here's the link: ${jobPost.jobLink}
 
 FYI: Some Internship closes within 2 hours 🚨, so apply early & follow me for most up-to-date internship/job 💼 opportunities.
 
-#Internship #JobOpportunity #JobSearch #LinkedInBot
+#Internship #JobOpportunity #JobSearch #ComputerScience #SoftwareEngineer #CS #Tech
     `;
 
     return postContent;

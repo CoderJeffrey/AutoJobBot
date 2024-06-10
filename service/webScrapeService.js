@@ -1,4 +1,5 @@
 const { Builder, By, until } = require('selenium-webdriver');
+const config = require('../config/config');
 const chrome = require('selenium-webdriver/chrome');
 
 const { DateStrToDateObj } = require('../helpers/time');
@@ -33,9 +34,10 @@ async function scrape() {
         console.log('Total Rows Length:', totalRows);
 
         let jobPosts = [];
+        let numJobPostsToCrawl = config.jobEntriesNum;
 
         // loop through the first 10 rows
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < numJobPostsToCrawl; i++) {
             console.log('Row:', i)
             let row = rows[i];
             let cells = await row.findElements(By.css('td'));
