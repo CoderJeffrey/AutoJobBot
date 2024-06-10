@@ -32,52 +32,51 @@ async function scrape() {
         let totalRows = rows.length;
         console.log('Total Rows Length:', totalRows);
 
+        let jobPosts = [];
+
+        // loop through the first 10 rows
         for (let i = 0; i < 10; i++) {
             console.log('Row:', i)
             let row = rows[i];
             let cells = await row.findElements(By.css('td'));
             let totalCells = cells.length;
-            console.log('Total Cells Length:', totalCells);
 
             let company = await cells[0].getText();
-            console.log('%d: Company: %s', i, company);
 
             // get the job title and post date from the first row
             let jobTitle = await cells[1].getText();
-            console.log('%d: Job Title: %s', i, jobTitle);
 
             let jobLocation = await cells[2].getText();
-            console.log('%d: Job Location: %s', i, jobLocation);
+
+            // the third field is an empty field with href to the link for the job post
+            let joblink = await cells[3].
+                findElement(By.css('a')).
+                getAttribute('href');
 
             let postDate = await cells[4].getText();
-            console.log('%d: Post Date: %s', i, postDate);
 
             // convert the date to a Date object
             let postDateObj = DateStrToDateObj(postDate);
-            console.log('%d: Post Date Object: %s', i, postDateObj);
 
-            // the date minus 1 day
-            let postDateMinusOneDay = new Date(postDateObj);
-            postDateMinusOneDay.setDate(postDateObj.getDate() - 1);
-            console.log('%d: Post Date Minus One Day: %s', i, postDateMinusOneDay);
+            if (i === 0) {
+                // print the date for the first job post
+                console.log('1st Job Post Date:', postDateObj);
+            }
+
+            // create a job post object
+            let jobPost = {
+                company: company,
+                jobTitle: jobTitle,
+                jobLocation: jobLocation,
+                postDate: postDateObj,
+                jobLink: joblink
+            };
+
+            // add the job post to the jobPosts array
+            jobPosts.push(jobPost);
         }
 
-        // print the table body
-        // let tableBodyText = await tableBody.getText();
-        // // print the top 1000 characters of the table body
-        // await console.log('Table Body:\n', tableBodyText.substring(0, 1000));
-
-        // Locate the first row of the table
-        // let firstRow = await driver.findElement(By.css('table tbody tr'));
-        //
-        // // print
-        //
-        // // Get the job title and post date from the first row
-        // let jobTitle = await firstRow.findElement(By.css('td:nth-child(1)')).getText();
-        // let postDate = await firstRow.findElement(By.css('td:nth-child(4)')).getText();
-        //
-        // console.log('Job Title:', jobTitle);
-        // console.log('Post Date:', postDate);
+        return jobPosts;
     } catch (err) {
         console.error(err);
     } finally {
@@ -86,6 +85,6 @@ async function scrape() {
     }
 }
 
-scrape();
+// scrape();
 
 module.exports = { scrape };

@@ -1,15 +1,41 @@
 const axios = require('axios');
 const config = require('../config/config');
-
+const scrapeWebsite = require('../service/webScrapeService');
+const writePost = require('../helpers/writePostContent');
 
 const accessToken = config.accessToken;
-console.log("accessToken is:", accessToken);
 
-const publishPost = async () => {
+const getWebScrapeData = async () => {
     try {
-        const random = Math.floor(Math.random() * 1000);
-        let postContent = `This is a test post using LinkedIn API ${random}`;
+        const jobPosts = await scrapeWebsite.scrape();
+        // get the first 3 job posts
+        let firstThreeJobPosts = jobPosts.slice(0, 3);
+        console.log("First 3 Job Posts are:", firstThreeJobPosts);
+        return jobPosts;
+    } catch (error) {
+        console.error("error is:", error);
+    }
+}
 
+const getPostContent = async () => {
+    try {
+        const jobPosts = await getWebScrapeData();
+        // get the first job post
+        let firstJobPost = jobPosts[0];
+
+        let postContent = writePost.writePostContent(firstJobPost);
+        console.log("For Job %d the post content is: %s", 0, postContent);
+
+        return postContent;
+    } catch (error) {
+        console.error("error is:", error);
+    }
+
+}
+
+// the action to publish a post
+const publishPostAction = async (postContent) => {
+    try {
         const response = await axios.post('https://api.linkedin.com/rest/posts', {
             "author": "urn:li:person:QMGpV_X3Ej",
             "commentary": `${postContent}`,
@@ -28,6 +54,21 @@ const publishPost = async () => {
                 'LinkedIn-Version': '202403'
             }
         });
+        console.log("Post response status from Service is:", response.statusText);
+        return response;
+    } catch (error) {
+        console.error("error is:", error);
+    }
+};
+
+
+const publishPost = async () => {
+    try {
+        // get the post content
+        let postContent = await getPostContent();
+
+        // initiate the postContent
+        const response = await publishPostAction(postContent);
         console.log("Post response status from Service is:", response.statusText);
         return response;
     } catch (error) {
