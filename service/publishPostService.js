@@ -25,9 +25,8 @@ const filterPostByToday = (jobPosts) => {
         console.log("This is mode:", config.mode);
 
         // month is 0-based (0 is January, 1 is February, etc.) thus -1
-        // convert the string to a number
         console.log("Test Post Date:", config.testPostDate.year, config.testPostDate.month, config.testPostDate.day)
-        let testPostDateYear = parseInt(config.testPostDate.year);
+
         todayDate = new Date(
             parseInt(config.testPostDate.year),
             parseInt(config.testPostDate.month) - 1,
@@ -122,7 +121,7 @@ const publishPost = async () => {
             let postContent = postContentList[i];
             console.log("Post content %d is: %s", i, postContent);
 
-            if (config.mode === MODE.TEST) {
+            if (config.mode === MODE.DEPLOY) {
                 const response = await publishPostAction(postContent);
                 console.log("Post response status from Service is:", response.statusText);
             }
