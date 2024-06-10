@@ -4,7 +4,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +17,8 @@
     "circular-json": "^0.5.9",
     "express": "^4.19.2",
     "flatted": "^3.3.1",
+    "node-cron": "^3.0.3",
+    "nodemon": "^3.1.3",
     "path": "^0.12.7",
     "selenium-webdriver": "^4.21.0"
   },
