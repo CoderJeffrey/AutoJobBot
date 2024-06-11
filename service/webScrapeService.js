@@ -38,7 +38,6 @@ async function scrape() {
 
         // loop through the first 10 rows
         for (let i = 0; i < numJobPostsToCrawl; i++) {
-            console.log('Row:', i)
             let row = rows[i];
             let cells = await row.findElements(By.css('td'));
             let totalCells = cells.length;
