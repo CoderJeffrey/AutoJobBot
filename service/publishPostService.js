@@ -46,15 +46,15 @@ const filterPostByToday = (jobPosts) => {
     });
 
     let parts =  formatter.formatToParts(todayDate);
-    let todayYear = parts.find(part => part.type === 'year').value;
-    let todayMonth = parts.find(part => part.type === 'month').value;
-    let todayDay = parts.find(part => part.type === 'day').value;
-    let todayHour = parts.find(part => part.type === 'hour').value;
-    let todayMinute = parts.find(part => part.type === 'minute').value;
-    console.log("Today's date: %s/%s/%s %s:%s", todayYear, todayMonth, todayDay, todayHour, todayMinute);
+    let todayYear = parseInt(parts.find(part => part.type === 'year').value);
+    let todayMonth = parseInt(parts.find(part => part.type === 'month').value);
+    let todayDay = parseInt(parts.find(part => part.type === 'day').value);
+    let todayHour = parseInt(parts.find(part => part.type === 'hour').value);
+    let todayMinute = parseInt(parts.find(part => part.type === 'minute').value);
 
     for (let i = 0; i < jobPosts.length; i++) {
         let postDate = jobPosts[i].postDate;
+        console.log("Post %d date: %s/%s/%s", i, postDate.getFullYear(), postDate.getMonth() + 1, postDate.getDate());
 
         if (postDate.getFullYear() === todayYear
             && postDate.getMonth() + 1 === todayMonth

@@ -16,7 +16,12 @@ app.listen(PORT, () => {
 
 // make a daily post by calling the publishPost function from controller
 // at 11:20 PM every day (Los Angeles time)
-cron.schedule('45 23 * * *', async () => {
+
+// read the hour and minute from the config file
+const dailyPostHour = process.env.DAILY_POST_HOUR;
+const dailyPostMinute = process.env.DAILY_POST_MINUTE;
+
+cron.schedule(`${dailyPostMinute} ${dailyPostHour} * * *`, async () => {
     // Print out current exact time
     console.log('Making a daily post at:', new Date().toISOString());
     try {
