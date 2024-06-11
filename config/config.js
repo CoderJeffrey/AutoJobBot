@@ -1,4 +1,4 @@
-require('dotenv').config({ path: './config/.env' });
+require('dotenv').config();
 
 module.exports = {
     accessToken: process.env.ACCESS_TOKEN,
