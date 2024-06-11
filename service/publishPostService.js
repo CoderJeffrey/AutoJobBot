@@ -33,20 +33,35 @@ const filterPostByToday = (jobPosts) => {
             parseInt(config.testPostDate.day));
     }
 
-    let todayYear = todayDate.getFullYear();
-    let todayMonth = todayDate.getMonth() + 1;
-    let todayDay = todayDate.getDate();
-    console.log("Today's date: %s/%s/%s", todayYear, todayMonth, todayDay);
+    // use LA time zone
+    let formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Los_Angeles',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });
+
+    let parts =  formatter.formatToParts(todayDate);
+    let todayYear = parts.find(part => part.type === 'year').value;
+    let todayMonth = parts.find(part => part.type === 'month').value;
+    let todayDay = parts.find(part => part.type === 'day').value;
+    let todayHour = parts.find(part => part.type === 'hour').value;
+    let todayMinute = parts.find(part => part.type === 'minute').value;
+    console.log("Today's date: %s/%s/%s %s:%s", todayYear, todayMonth, todayDay, todayHour, todayMinute);
 
     for (let i = 0; i < jobPosts.length; i++) {
-        console.log("%d: ", i);
         let postDate = jobPosts[i].postDate;
-        console.log("Post %d date: %s/%s/%s", i, postDate.getFullYear(), postDate.getMonth() + 1, postDate.getDate());
 
         if (postDate.getFullYear() === todayYear
             && postDate.getMonth() + 1 === todayMonth
             && postDate.getDate() === todayDay) {
             console.log("Post %d matches today's date", i);
+            console.log("Post %d date: %s/%s/%s", i, postDate.getFullYear(), postDate.getMonth() + 1, postDate.getDate());
+
             todayPosts.push(jobPosts[i]);
         }
     }
