@@ -3,7 +3,7 @@
 
 # Environment variables
 .env
-**/.env
+.env
 
 # Logs
 logs
@@ -55,7 +55,7 @@ build
 
 # dotenv environment variables file
 .env
-**/.env
+.env
 
 # Optional npm cache directory
 .npm
