@@ -11,20 +11,20 @@ function writePostContent(jobPost) {
     const postDay = jobPost.postDate.getUTCDate();
 
     const postContent = `
-📢 ${jobPost.company} Just released its ${jobPost.jobTitle} role 📢
+🚀 Exciting Internship Alert! 🚀
 
-You Can't Miss Out on This Must-Apply Internship/Job Opportunity!
+${jobPost.company} just released its ${jobPost.jobTitle} role 
 
-Something to know about
+Something to know about:
 1. The role is based in ${jobPost.jobLocation}.
 2. The role was posted on ${postMonth}/${postDay}/${postYear}.
-2. The position is usually filled within 48 hours, so apply NOW! NOW! NOW!
+3. The position is usually filled within 48 hours, so apply NOW! NOW! NOW!
 
 Here's the link: ${jobPost.jobLink}
 
 FYI: Some Internship closes within 2 hours 🚨, so apply early & follow me for most up-to-date internship/job 💼 opportunities.
 
-#Internship #JobOpportunity #JobSearch #ComputerScience #SoftwareEngineer #CS #Tech
+#Internship #JobOpportunity #JobSearch #ComputerScience #SoftwareEngineer #CS #Tech #FYI
     `;
 
     return postContent;
@@ -36,12 +36,12 @@ function writeArticleSource(jobPost) {
 }
 
 const writeArticleTitle = (jobPost) => {
-    const articleTitle = `${jobPost.company} is hiring for ${jobPost.jobTitle}`;
+    const articleTitle = `${jobPost.company}`;
     return articleTitle;
 }
 
 const writeArticleDescription = (jobPost) => {
-    const articleDescription = ``;
+    const articleDescription = `${jobPost.jobTitle}`;
     return articleDescription;
 }
 
