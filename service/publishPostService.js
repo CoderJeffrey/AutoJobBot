@@ -2,6 +2,7 @@ const axios = require('axios');
 const config = require('../config/config');
 const scrapeWebsite = require('../service/webScrapeService');
 const writePost = require('../helpers/writePostContent');
+const PostContentObj = require('../models/PostContentObj');
 
 const accessToken = config.accessToken;
 
@@ -52,6 +53,8 @@ const filterPostByToday = (jobPosts) => {
     let todayHour = parseInt(parts.find(part => part.type === 'hour').value);
     let todayMinute = parseInt(parts.find(part => part.type === 'minute').value);
 
+    console.log("Today %s/%s/%s %s:%s", todayYear, todayMonth, todayDay, todayHour, todayMinute);
+
     for (let i = 0; i < jobPosts.length; i++) {
         let postDate = jobPosts[i].postDate;
         console.log("Post %d date: %s/%s/%s", i, postDate.getFullYear(), postDate.getMonth() + 1, postDate.getDate());
@@ -83,11 +86,23 @@ const getWebScrapeData = async () => {
 const getPostContentList = async () => {
     try {
         const jobPosts = await getWebScrapeData();
+
+        // create a list of post content with PostContentObj
         const postContentList = [];
 
         for (let i = 0; i < jobPosts.length; i++) {
             let postContent = writePost.writePostContent(jobPosts[i]);
-            postContentList.push(postContent);
+            let articleSource = writePost.writeArticleSource(jobPosts[i]);
+            let articleTitle = writePost.writeArticleTitle(jobPosts[i]);
+            let articleDescription = writePost.writeArticleDescription(jobPosts[i]);
+
+            let postContentObj = new PostContentObj(
+                postContent,
+                articleSource,
+                articleTitle,
+                articleDescription);
+
+            postContentList.push(postContentObj);
         }
 
         return postContentList;
@@ -98,12 +113,20 @@ const getPostContentList = async () => {
 }
 
 // the action to publish a post
-const publishPostAction = async (postContent) => {
+const publishPostAction = async (postContentObj) => {
     try {
         const response = await axios.post('https://api.linkedin.com/rest/posts', {
             "author": "urn:li:person:QMGpV_X3Ej",
-            "commentary": `${postContent}`,
+            "commentary": `${postContentObj.postContent}`,
             "visibility": "PUBLIC",
+            "content": {
+                "article": {
+                    "source": `${postContentObj.articleSource}`,
+                    "title": `${postContentObj.articleTitle}`,
+                    "description": `${postContentObj.articleDescription}`,
+                    "thumbnail": `urn:li:image:D5610AQE645mVkDjxNQ`
+                }
+            },
             "distribution": {
                 "feedDistribution": "MAIN_FEED",
                 "targetEntities": [],
@@ -118,12 +141,13 @@ const publishPostAction = async (postContent) => {
                 'LinkedIn-Version': '202403'
             }
         });
-        console.log("Post response status from Service is:", response.statusText);
+
         return response;
     } catch (error) {
         console.error("error is:", error);
     }
 };
+
 
 
 const publishPost = async () => {
@@ -133,12 +157,15 @@ const publishPost = async () => {
 
         // initiate the postContent
         for (let i = 0; i < postContentList.length; i++) {
-            let postContent = postContentList[i];
-            console.log("Post content %d is: %s", i, postContent);
+            let postContentObj = postContentList[i];
+            console.log("Post content %d is: %s", i, postContentObj.postContent);
+            console.log("Article source %d is: %s", i, postContentObj.articleSource);
+            console.log("Article title %d is: %s", i, postContentObj.articleTitle);
+            console.log("Article description %d is: %s", i, postContentObj.articleDescription);
 
             if (config.mode === MODE.DEPLOY) {
-                const response = await publishPostAction(postContent);
-                console.log("Post response status from Service is:", response.statusText);
+                const response = await publishPostAction(postContentObj);
+                console.log("Post response status is:", response.statusText);
             }
 
             // sleep for 15 seconds before making the next post (set by config)
