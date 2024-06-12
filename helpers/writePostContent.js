@@ -30,5 +30,20 @@ FYI: Some Internship closes within 2 hours 🚨, so apply early & follow me for 
     return postContent;
 }
 
+function writeArticleSource(jobPost) {
+    const articleSource = `${jobPost.jobLink}`;
+    return articleSource;
+}
 
-module.exports = { writePostContent };
+const writeArticleTitle = (jobPost) => {
+    const articleTitle = `${jobPost.company} is hiring for ${jobPost.jobTitle}`;
+    return articleTitle;
+}
+
+const writeArticleDescription = (jobPost) => {
+    const articleDescription = ``;
+    return articleDescription;
+}
+
+
+module.exports = { writePostContent , writeArticleSource, writeArticleTitle, writeArticleDescription };
