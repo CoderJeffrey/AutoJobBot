@@ -163,7 +163,7 @@ const publishPost = async () => {
             console.log("Article title %d is: %s", i, postContentObj.articleTitle);
             console.log("Article description %d is: %s", i, postContentObj.articleDescription);
 
-            if (config.mode === MODE.DEPLOY) {
+            if (config.mode === MODE.TEST) {
                 const response = await publishPostAction(postContentObj);
                 console.log("Post response status is:", response.statusText);
             }
