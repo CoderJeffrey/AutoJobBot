@@ -11,7 +11,7 @@ function writePostContent(jobPost) {
     const postDay = jobPost.postDate.getUTCDate();
 
     const postContent = `
-🚀 Exciting Internship Alert! 🚀
+🚀 Exciting Summer 2025 Internship Alert! 🚀
 
 ${jobPost.company} just released its ${jobPost.jobTitle} role 
 
