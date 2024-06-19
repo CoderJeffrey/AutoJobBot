@@ -14,7 +14,7 @@ async function scrape() {
 
     try {
         // Navigate to the website
-        await driver.get('https://github.com/SimplifyJobs/Summer2024-Internships');
+        await driver.get('https://github.com/SimplifyJobs/Summer2025-Internships');
 
         // Wait until the table is loaded
         await driver.wait(until.elementLocated(By.css('table tbody tr')), 10000);
@@ -39,7 +39,14 @@ async function scrape() {
         // loop through the first 10 rows
         for (let i = 0; i < numJobPostsToCrawl; i++) {
             let row = rows[i];
-            let cells = await row.findElements(By.css('td'));
+            let cells;
+            try {
+                cells = await row.findElements(By.css('td'));
+            } catch (e) {
+                console.log(`Skipping job post at row ${i + 1} due to missing cells.`);
+                break; // break out of the loop if there are no cells
+            }
+
             let totalCells = cells.length;
 
             let company = await cells[0].getText();
@@ -48,11 +55,17 @@ async function scrape() {
             let jobTitle = await cells[1].getText();
 
             let jobLocation = await cells[2].getText();
+            console.log("company:", company, " | jobTitle:", jobTitle, " | jobLocation:", jobLocation);
 
             // the third field is an empty field with href to the link for the job post
-            let joblink = await cells[3].
-                findElement(By.css('a')).
-                getAttribute('href');
+            let joblink;
+            try {
+                joblink = await cells[3].findElement(By.css('a')).getAttribute('href');
+            } catch (e) {
+                console.log(`Skipping job post at row ${i + 1} due to missing job link.`);
+                continue; // Skip this iteration if the job link is undefined
+            }
+
 
             let postDate = await cells[4].getText();
 
