@@ -68,3 +68,6 @@ build
 
 # /data directory
 /data
+
+# all .js files starts with try
+try*.js
