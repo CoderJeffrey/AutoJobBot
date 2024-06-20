@@ -7,7 +7,19 @@ const { DateStrToDateObj } = require('../helpers/time');
 
 const submitApplicationAction = async (applicationForm) => {
     // submit the application form
-    await applicationForm.submit();
+    // await applicationForm.submit();
+
+    // find the element from applicationForm with value Submit Application
+    let submitButton = await applicationForm.findElement(By.css('input[value="Submit Application"]'));
+    let submitButtonText = await submitButton.getAttribute('outerHTML');
+    console.log('Submit Button Text:', submitButtonText);
+
+    // click the submit button
+    await submitButton.click();
+
+    // let submitButton2 = await applicationForm.findElement(By.css('input[id="submit_app"]'));
+    // let submitButtonText2 = await submitButton2.getAttribute('outerHTML');
+    // console.log('Submit Button Text 2:', submitButtonText2);
 }
 
 const uploadResume = async (driver, resumeButton) => {
@@ -170,7 +182,7 @@ async function submitApplicationForGreenBoard() {
         }
 
         // sleep for 10s to avoid the bot detection
-        await driver.sleep(10000);
+        await driver.sleep(2000);
 
         // submit the application
         await submitApplicationAction(applicationForm);
