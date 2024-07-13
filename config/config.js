@@ -9,5 +9,6 @@ module.exports = {
         year: process.env.TEST_POST_DATE_YEAR,
         month: process.env.TEST_POST_DATE_MONTH,
         day: process.env.TEST_POST_DATE_DAY
-    }
+    },
+    logoAPIKey: process.env.LOGO_API_KEY,
 };

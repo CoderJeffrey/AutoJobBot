@@ -3,15 +3,13 @@ const addGettersSetters = require('../utils/addGetterAndSetters');
 
 class PostContentObj {
     // articleSource, articleTitle, articleDescription refers to the url/title/description of the shared link
-    constructor(postContent, articleSource, articleTitle, articleDescription) {
+    constructor(jobPost, postContent) {
+        this.jobPost = jobPost;
         this.postContent = postContent;
-        this.articleSource = articleSource;
-        this.articleTitle = articleTitle;
-        this.articleDescription = articleDescription;
     }
 }
 
-const properties = ['postContent', 'articleSource', 'articleTitle', 'articleDescription'];
+const properties = ['jobPost','postContent'];
 addGettersSetters(PostContentObj, properties);
 
 module.exports = PostContentObj;

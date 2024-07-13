@@ -3,7 +3,7 @@ const app = express();
 const postRoutes = require('./routes/publishPostRoute');
 const generalRoutes = require('./routes/generalRoute');
 const cron = require('node-cron');
-const { publishPost } = require('./controllers/publishPostController');
+const { publishPosts } = require('./controllers/publishPostController');
 
 app.use(express.json());
 app.use('/', generalRoutes);
@@ -25,7 +25,7 @@ cron.schedule(`${dailyPostMinute} ${dailyPostHour} * * *`, async () => {
     // Print out current exact time
     console.log('Making a daily post at:', new Date().toISOString());
     try {
-        await publishPost();
+        await publishPosts();
     } catch (error) {
         console.error("Error publishing post:", error);
     }

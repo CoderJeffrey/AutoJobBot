@@ -3,154 +3,172 @@ const config = require('../config/config');
 const scrapeWebsite = require('../service/webScrapeService');
 const writePost = require('../helpers/writePostContent');
 const PostContentObj = require('../models/PostContentObj');
+const fetchCompanyLogoService = require('../service/fetchCompanyLogo');
+const uploadPictureService = require('../service/UploadPictureService');
+const fileService = require('../service/FileSystem/FileService');
+const dbClient = require('../database/dbClient');
 
 const accessToken = config.accessToken;
+const generalImageURN = "urn:li:image:D5610AQHcMPlxJnPyJA";
+const path = require('path');
 
 const MODE = {
     TEST: 'TEST',
     DEPLOY: 'DEPLOY'
 }
 
-const filterPostByToday = (jobPosts) => {
-    let todayPosts = [];
+const filterPostByExistingPosts = async (jobPosts) => {
+    let eligiblePosts = [];
 
-    // get the list of job posts that match today's year/month/day
-
-    let todayDate = null;
-    if (config.mode === MODE.DEPLOY) {
-        // (deployment) set today's date to the current date
-        console.log("This is mode:", config.mode);
-        todayDate = new Date();
+    const existingPosts = await dbClient.connectToSupabaseAndGetJobs();
+    let companyDateTuples = null;
+    if (existingPosts === null) {
+        console.error("Existing posts are null. Skipping the filter.");
     } else {
-        // (testing) set today's date to 2024/5/5
-        console.log("This is mode:", config.mode);
+        console.log("Existing posts length is:", existingPosts.length);
+        console.log("First existing post is:", existingPosts[0]);
 
-        // month is 0-based (0 is January, 1 is February, etc.) thus -1
-        console.log("Test Post Date:", config.testPostDate.year, config.testPostDate.month, config.testPostDate.day)
+        // fetch the company_name: and date_posted: from the existing posts
+        companyDateTuples = new Set(existingPosts.map(post => JSON.stringify([post.company_name, post.date_posted, post.role])));
 
-        todayDate = new Date(
-            parseInt(config.testPostDate.year),
-            parseInt(config.testPostDate.month) - 1,
-            parseInt(config.testPostDate.day));
-    }
+        for (let i = 0; i < jobPosts.length; i++) {
+            let companyName = jobPosts[i].company;
+            let postDate = jobPosts[i].postDate;
+            let postRole = jobPosts[i].jobTitle;
+            let postDateStr = jobPosts[i].postDate.toISOString().split('T')[0];
+            // if the tuple of [companyName, postDate] is not in the existing posts, add it to the eligible posts
+            if (!companyDateTuples.has(JSON.stringify([companyName, postDateStr, postRole]))) {
+                eligiblePosts.push(jobPosts[i]);
+            }
 
-    // use LA time zone
-    let formatter = new Intl.DateTimeFormat('en-US', {
-        timeZone: 'America/Los_Angeles',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-    });
-
-    let parts =  formatter.formatToParts(todayDate);
-    let todayYear = parseInt(parts.find(part => part.type === 'year').value);
-    let todayMonth = parseInt(parts.find(part => part.type === 'month').value);
-    let todayDay = parseInt(parts.find(part => part.type === 'day').value);
-    let todayHour = parseInt(parts.find(part => part.type === 'hour').value);
-    let todayMinute = parseInt(parts.find(part => part.type === 'minute').value);
-
-    console.log("Today %s/%s/%s %s:%s", todayYear, todayMonth, todayDay, todayHour, todayMinute);
-
-    for (let i = 0; i < jobPosts.length; i++) {
-        let postDate = jobPosts[i].postDate;
-        console.log("Post %d date: %s/%s/%s", i, postDate.getFullYear(), postDate.getMonth() + 1, postDate.getDate());
-
-        if (postDate.getFullYear() === todayYear
-            && postDate.getMonth() + 1 === todayMonth
-            && postDate.getDate() === todayDay) {
-            console.log("Post %d matches today's date", i);
-            console.log("Post %d date: %s/%s/%s", i, postDate.getFullYear(), postDate.getMonth() + 1, postDate.getDate());
-
-            todayPosts.push(jobPosts[i]);
+            if (companyName === "Apple"){
+                console.log("For Apple's Case:");
+                // print i/companyName/postDate
+                console.log("i is:", i);
+                console.log("companyName is:", companyName);
+                console.log("postDate is:", postDate);
+                // print whether Apple is in the existing posts
+                let tmpResult = companyDateTuples.has(JSON.stringify([companyName, postDateStr]));
+                console.log("Apple => tmpResult is:", tmpResult);
+            }
         }
+
+        console.log("Eligible posts length is:", eligiblePosts.length);
     }
 
-    return todayPosts;
+    return eligiblePosts;
 }
 
-const getWebScrapeData = async () => {
+const getWebScrapeDataAndFilter = async () => {
     try {
         const jobPosts = await scrapeWebsite.scrape();
         // filter the job posts by today's date
-        const filteredPosts = filterPostByToday(jobPosts);
+        const filteredPosts = filterPostByExistingPosts(jobPosts);
         return filteredPosts;
     } catch (error) {
-        console.error("error is:", error);
+        console.error("getWebScrapeDataAndFilter error is:", error);
     }
 }
 
 const getPostContentList = async () => {
     try {
-        const jobPosts = await getWebScrapeData();
+        const eligibleJobPosts = await getWebScrapeDataAndFilter();
 
         // create a list of post content with PostContentObj
         const postContentList = [];
 
-        for (let i = 0; i < jobPosts.length; i++) {
-            let postContent = writePost.writePostContent(jobPosts[i]);
-            let articleSource = writePost.writeArticleSource(jobPosts[i]);
-            let articleTitle = writePost.writeArticleTitle(jobPosts[i]);
-            let articleDescription = writePost.writeArticleDescription(jobPosts[i]);
-
+        for (let i = 0; i < eligibleJobPosts.length; i++) {
+            let jobPost = eligibleJobPosts[i];
+            let postContent = writePost.writePostContent(eligibleJobPosts[i]);
             let postContentObj = new PostContentObj(
-                postContent,
-                articleSource,
-                articleTitle,
-                articleDescription);
+                jobPost,
+                postContent);
 
             postContentList.push(postContentObj);
         }
 
         return postContentList;
     } catch (error) {
-        console.error("error is:", error);
+        console.error("getPostContentList error is:", error);
     }
 
 }
 
 // the action to publish a post
-const publishPostAction = async (postContentObj) => {
+const publishPostAction = async (postContentObj, imageURN) => {
     try {
-        const response = await axios.post('https://api.linkedin.com/rest/posts', {
-            "author": "urn:li:person:QMGpV_X3Ej",
-            "commentary": `${postContentObj.postContent}`,
-            "visibility": "PUBLIC",
-            "content": {
-                "article": {
-                    "source": `${postContentObj.articleSource}`,
-                    "title": `${postContentObj.articleTitle}`,
-                    "description": `${postContentObj.articleDescription}`,
-                    "thumbnail": `urn:li:image:D5610AQE645mVkDjxNQ`
+        const response = await axios.post('https://api.linkedin.com/rest/posts',
+            {
+                "author": "urn:li:person:QMGpV_X3Ej",
+                "commentary": `${postContentObj.postContent}`,
+                "visibility": "PUBLIC",
+                "distribution": {
+                    "feedDistribution": "MAIN_FEED",
+                    "targetEntities": [],
+                    "thirdPartyDistributionChannels": []
+                },
+                "content": {
+                    "media": {
+                        "altText": `logo for ${postContentObj.jobPost.company}`,
+                        "id": `${imageURN}`
+                    }
+                },
+                "lifecycleState": "PUBLISHED",
+                "isReshareDisabledByAuthor": false
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'X-Restli-Protocol-Version': '2.0.0',
+                    'LinkedIn-Version': '202403'
                 }
-            },
-            "distribution": {
-                "feedDistribution": "MAIN_FEED",
-                "targetEntities": [],
-                "thirdPartyDistributionChannels": []
-            },
-            "lifecycleState": "PUBLISHED",
-            "isReshareDisabledByAuthor": false
-        }, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'X-Restli-Protocol-Version': '2.0.0',
-                'LinkedIn-Version': '202403'
-            }
-        });
+            });
 
         return response;
     } catch (error) {
-        console.error("error is:", error);
+        console.error("error of posting is:", error);
     }
 };
 
+const getPostPicImageURN = async (companyName) => {
+    let imageURN = "";
 
+    // fetch the company logo
+    const fetchedPhotoUrl = await fetchCompanyLogoService.fetchCompanyLogoAndDownload(companyName);
+    if (fetchedPhotoUrl) {
+        let fileType = fetchedPhotoUrl.split('.').pop(); // get the file type
+        let companyLogoExisted = false;
 
-const publishPost = async () => {
+        // check if the company logo is found in resource/company folder
+        let companyImageName = `${companyName}.${fileType}`;
+        try {
+            companyLogoExisted = await fileService.findFileInDirectory(path.resolve(__dirname, `../resource/company/`), companyImageName);
+        } catch (error) {
+            console.error("findFileInDirectory error is:", error);
+            return generalImageURN;
+        }
+
+        // upload the picture to LinkedIn and get the image URN
+        if (companyLogoExisted) {
+            console.log("Company logo is found in resource/company folder");
+
+            // upload the picture to LinkedIn
+            imageURN = await uploadPictureService.performUploadPicture(companyImageName);
+            if (imageURN === null) {
+                console.error("Image URN is invalid. Skipping the post.");
+                imageURN = generalImageURN;
+            }
+
+            // write the imageURN to the ./resource/directory/companyToImageURN.txt
+            fileService.appendCompanyToImageURN(companyName, imageURN);
+        }
+    } else {
+        imageURN = generalImageURN;
+    }
+
+    return imageURN;
+}
+
+const publishPosts = async () => {
     try {
         // get the list of post content
         let postContentList = await getPostContentList();
@@ -158,26 +176,35 @@ const publishPost = async () => {
         // initiate the postContent
         for (let i = 0; i < postContentList.length; i++) {
             let postContentObj = postContentList[i];
+            let jobPost = postContentObj.jobPost;
+            let companyName = jobPost.company;
+
+            console.log("Company name %d is: %s", i, companyName);
             console.log("Post content %d is: %s", i, postContentObj.postContent);
-            console.log("Article source %d is: %s", i, postContentObj.articleSource);
-            console.log("Article title %d is: %s", i, postContentObj.articleTitle);
-            console.log("Article description %d is: %s", i, postContentObj.articleDescription);
+            const imageURN = await getPostPicImageURN(companyName);
 
             if (config.mode === MODE.DEPLOY) {
-                const response = await publishPostAction(postContentObj);
-                console.log("Post response status is:", response.statusText);
+                const response = await publishPostAction(postContentObj, imageURN);
+                console.log("Post response status for %s is: %d", companyName, response.status);
+
+                // if the post is successful, write the company to the supabase database
+                if (response.statusText === "Created") {
+                    // write the company to the supabase database
+                    let postedResult = dbClient.connectToSupabaseAndPostJob(postContentObj.jobPost);
+                    console.log("Response for db PostJob for %s is:", companyName, postedResult);
+                }
             }
 
-            // sleep for 15 seconds before making the next post (set by config)
+            // sleep for 60 seconds before making the next post (set by config)
             await new Promise(r => setTimeout(r, config.sleepEachPost * 1000));
         }
     } catch (error) {
-        console.error("error is:", error);
+        console.error("publishPosts error is:", error);
     }
 
     return null;
 };
 
 module.exports = {
-    publishPost
+    publishPosts
 };

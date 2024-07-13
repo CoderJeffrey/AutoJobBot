@@ -12,7 +12,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@supabase/supabase-js": "^2.44.3",
     "axios": "^1.7.2",
+    "child_process": "^1.0.2",
     "chromedriver": "^125.0.3",
     "circular-json": "^0.5.9",
     "dotenv": "^16.4.5",
