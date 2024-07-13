@@ -24,7 +24,10 @@ const filterPostByExistingPosts = async (jobPosts) => {
     let companyDateTuples = null;
     if (existingPosts === null) {
         console.error("Existing posts are null. Skipping the filter.");
-    } else {
+    } else if (jobPosts === null) {
+        console.error("Job posts are null. Skipping the filter.");
+    }
+    else {
         console.log("Existing posts length is:", existingPosts.length);
         console.log("First existing post is:", existingPosts[0]);
 
