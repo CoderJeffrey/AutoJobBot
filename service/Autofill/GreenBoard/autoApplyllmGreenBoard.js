@@ -1,29 +1,49 @@
 const { Builder, By, until } = require('selenium-webdriver');
-const config = require('../config/config');
+const config = require('../../../config/config');
 const chrome = require('selenium-webdriver/chrome');
 const path = require('path');
 
-const { DateStrToDateObj } = require('../helpers/time');
+/*
+screenshot.js to keep track of the current page
+set up a prompt to apply for the position for the candidate with
+1. the resume text
+2. the additional questions for candidates basic information
+2.1 What is your ethnicity?
+2.2 Are you disabled? (use the form from Workday)
+2.3 Are you a former veteran? (use the form from Workday)
+2.4 What is your self identified gender?
+2.5 Do you need sponsorship now or in the near future?
+
+Backlog of unfinished applications if the agent found itself stuck in one of the link
+1. cover-letter related questions - can be written solely in AI if user approved
+2. qualification question like if you have prior experience working with a specific tech stack?
+- ask users feedback (and let them recheck on the application)
+- should be a board of applied jobs + information that is used for the application
+- status: applied / needs confirmation / potential match
+
+*/
+
+
+const { DateStrToDateObj } = require('../../../helpers/time');
+
+const MODE = {
+    TEST: 'TEST',
+    DEPLOY: 'DEPLOY'
+}
 
 const submitApplicationAction = async (applicationForm) => {
-    // submit the application form
-    // await applicationForm.submit();
-
+    // click the submit button
     // find the element from applicationForm with value Submit Application
-    let submitButton = await applicationForm.findElement(By.css('input[value="Submit Application"]'));
+    let submitButton = await applicationForm.findElement(By.css('input[id="submit_app"]'));
     let submitButtonText = await submitButton.getAttribute('outerHTML');
     console.log('Submit Button Text:', submitButtonText);
 
     // click the submit button
     await submitButton.click();
-
-    // let submitButton2 = await applicationForm.findElement(By.css('input[id="submit_app"]'));
-    // let submitButtonText2 = await submitButton2.getAttribute('outerHTML');
-    // console.log('Submit Button Text 2:', submitButtonText2);
 }
 
-const uploadResume = async (driver, resumeButton) => {
-    const filePath = path.resolve(__dirname, '../resource/Resume_Tech_Buddy.pdf');
+const uploadResumeAction = async (driver, resumeButton) => {
+    const filePath = path.resolve(__dirname, '../../../resource/Resume_Tech_Buddy.pdf');
 
     // print the exact path of the file
     console.log('File Path:', filePath);
@@ -44,10 +64,10 @@ const uploadResume = async (driver, resumeButton) => {
 }
 
 
-async function submitApplicationForGreenBoard() {
+async function submitApplicationForGreenBoard(applicationURL) {
     // Setup Chrome options
     let options = new chrome.Options();
-    options.addArguments('--headless'); // Run Chrome in headless mode
+    // options.addArguments('--headless'); // Run Chrome in headless mode
 
     // Initialize the WebDriver
     // let driver = await new Builder().forBrowser('chrome').setChromeOptions(options).build();
@@ -55,7 +75,7 @@ async function submitApplicationForGreenBoard() {
 
     try {
         // Navigate to the website
-        await driver.get('https://boards.greenhouse.io/verkada/jobs/4128987007');
+        await driver.get(applicationURL);
 
         // Wait until the table is loaded
         await driver.wait(until.elementLocated(By.css('form')), 10000);
@@ -97,20 +117,32 @@ async function submitApplicationForGreenBoard() {
                 await mainInputField.sendKeys('Tech');
             }
 
+            // wait for 1s to avoid the bot detection
+            await driver.sleep(100);
+
             // for the last input field, enter the value "Buddy"
             if(mainInputFieldAttributes === 'last_name') {
                 await mainInputField.sendKeys('Buddy');
             }
 
+            // wait for 1s to avoid the bot detection
+            await driver.sleep(100);
+
             // for the email input field, enter the value "TechBuddy@gmail.com"
             if(mainInputFieldAttributes === 'email') {
-                await mainInputField.sendKeys('jeffreyliu@gmail.com');
+                await mainInputField.sendKeys('jeffreyliu_test@gmail.com');
             }
+
+            // wait for 1s to avoid the bot detection
+            await driver.sleep(100);
 
             // phone filed, enter the value "1234567890"
             if(mainInputFieldAttributes === 'phone') {
                 await mainInputField.sendKeys('2134567890');
             }
+
+            // wait for 1s to avoid the bot detection
+            await driver.sleep(100);
         }
 
         // upload the resume
@@ -135,7 +167,7 @@ async function submitApplicationForGreenBoard() {
 
             if(resumeButtonText.toLowerCase() === 'attach') {
                 console.log('Clicking the Attach button');
-                await uploadResume(driver, resumeButton);
+                await uploadResumeAction(driver, resumeButton);
             }
         }
 
@@ -169,9 +201,13 @@ async function submitApplicationForGreenBoard() {
                     switch (labelText.toLowerCase()) {
                         case 'linkedin profile':
                             await customInputSubField.sendKeys('https://www.linkedin.com/in/techbuddy');
+                            // wait for 1s to avoid the bot detection
+                            await driver.sleep(100);
                             break;
                         case 'website':
                             await customInputSubField.sendKeys('https://www.techbuddy.com');
+                            // wait for 1s to avoid the bot detection
+                            await driver.sleep(100);
                             break;
                         default:
                             console.log(`No matching label text found for ${labelText}`);
@@ -191,10 +227,12 @@ async function submitApplicationForGreenBoard() {
         console.error(err);
     } finally {
         // Quit the WebDriver
-        // await driver.quit();
+        if (config.mode === MODE.DEPLOY) {
+            await driver.quit();
+        }
     }
 }
 
-submitApplicationForGreenBoard();
+submitApplicationForGreenBoard("https://boards.greenhouse.io/verkada/jobs/4128987007");
 
 // module.exports = { scrape };

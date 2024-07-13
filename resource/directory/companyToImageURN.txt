@@ -1,0 +1,8 @@
+Quanterix:urn:li:image:D5610AQFqfRJvWs1vfA
+BlackRock:urn:li:image:D5610AQH6eGGKfMhLTQ
+Palantir:urn:li:image:D5610AQHqakGRV6WKlg
+Morgan Stanley:urn:li:image:D5610AQHGsgsTkrW9yw
+Rockwell Automation:urn:li:image:D5610AQHqUhHUKPXhrg
+Apple:urn:li:image:D5610AQFoYHtDldwYsg
+Ventas:urn:li:image:D5610AQGj4vvFpqCsSQ
+SIG:urn:li:image:D5610AQEHC37fxelX_g

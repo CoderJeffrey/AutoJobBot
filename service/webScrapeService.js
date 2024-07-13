@@ -17,7 +17,12 @@ async function scrape() {
         await driver.get('https://github.com/SimplifyJobs/Summer2025-Internships');
 
         // Wait until the table is loaded
-        await driver.wait(until.elementLocated(By.css('table tbody tr')), 10000);
+        try {
+            await driver.wait(until.elementLocated(By.css('table tbody tr')), 15000);
+        } catch (e) {
+            console.log('Table not found.');
+            return;
+        }
 
         // print the table body
         let tables = await driver.findElements(By.css('table'));
@@ -49,13 +54,15 @@ async function scrape() {
 
             let totalCells = cells.length;
 
+            // skip nested companies (↳)
             let company = await cells[0].getText();
+            if (company === "↳") {
+                console.log(`Skipping job post at row ${i + 1} due to nested company.`);
+                continue;
+            }
 
-            // get the job title and post date from the first row
             let jobTitle = await cells[1].getText();
-
             let jobLocation = await cells[2].getText();
-            console.log("company:", company, " | jobTitle:", jobTitle, " | jobLocation:", jobLocation);
 
             // the third field is an empty field with href to the link for the job post
             let joblink;
@@ -65,7 +72,6 @@ async function scrape() {
                 console.log(`Skipping job post at row ${i + 1} due to missing job link.`);
                 continue; // Skip this iteration if the job link is undefined
             }
-
 
             let postDate = await cells[4].getText();
 
