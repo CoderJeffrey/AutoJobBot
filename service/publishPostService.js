@@ -35,6 +35,7 @@ const filterPostByExistingPosts = async (jobPosts) => {
         companyDateTuples = new Set(existingPosts.map(post => JSON.stringify([post.company_name, post.date_posted, post.role])));
 
         for (let i = 0; i < jobPosts.length; i++) {
+            console.log("filterPostByExistingPosts) i is:", i);
             let companyName = jobPosts[i].company;
             let postDate = jobPosts[i].postDate;
             let postRole = jobPosts[i].jobTitle;
@@ -93,6 +94,7 @@ const getPostContentList = async () => {
         return postContentList;
     } catch (error) {
         console.error("getPostContentList error is:", error);
+        return [];
     }
 
 }
