@@ -8,6 +8,7 @@ async function scrape() {
     // Setup Chrome options
     let options = new chrome.Options();
     options.addArguments('--headless'); // Run Chrome in headless mode
+    options.addArguments('--no-sandbox');
 
     // Initialize the WebDriver
     let driver = await new Builder().forBrowser('chrome').setChromeOptions(options).build();
