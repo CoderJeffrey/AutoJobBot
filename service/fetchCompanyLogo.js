@@ -31,15 +31,37 @@ const downloadPhotoToLocal = async (photoUrl, companyName) => {
             responseType: 'stream'
         });
 
+        // for companyName with space or any special characters, replace them with empty string
+        companyName = companyName.replace(/[^a-zA-Z0-9]/g, '');
+        // companyName = "testWellsFargo";
+
         // store the image in current directory
         let filePath = path.resolve(__dirname, `../resource/company/${companyName}.${fileType}`);
-        response.data.pipe(fs.createWriteStream(filePath));
+
+        // download and save the file
+        await downloadAndSaveFile(response, filePath);
 
         return filePath;
     } catch (error) {
         console.error("downloadPhotoToLocal error is:", error);
     }
 }
+
+const downloadAndSaveFile = async (response, filePath) => {
+    return new Promise((resolve, reject) => {
+        const fileStream = fs.createWriteStream(filePath);
+
+        response.data.pipe(fileStream)
+            .on('finish', () => {
+                console.log('File write complete.');
+                resolve(); // Resolve the promise when the write is finished
+            })
+            .on('error', (err) => {
+                console.error('Error writing file:', err);
+                reject(err); // Reject the promise if there is an error
+            });
+    });
+};
 
 
 const fetchCompanyLogoAndDownload = async (companyName) => {

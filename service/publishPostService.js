@@ -35,7 +35,7 @@ const filterPostByExistingPosts = async (jobPosts) => {
         companyDateTuples = new Set(existingPosts.map(post => JSON.stringify([post.company_name, post.date_posted, post.role])));
 
         for (let i = 0; i < jobPosts.length; i++) {
-            console.log("filterPostByExistingPosts) i is:", i);
+            // console.log("filterPostByExistingPosts) i is:", i);
             let companyName = jobPosts[i].company;
             let postDate = jobPosts[i].postDate;
             let postRole = jobPosts[i].jobTitle;
@@ -44,20 +44,9 @@ const filterPostByExistingPosts = async (jobPosts) => {
             if (!companyDateTuples.has(JSON.stringify([companyName, postDateStr, postRole]))) {
                 eligiblePosts.push(jobPosts[i]);
             }
-
-            if (companyName === "Apple"){
-                console.log("For Apple's Case:");
-                // print i/companyName/postDate
-                console.log("i is:", i);
-                console.log("companyName is:", companyName);
-                console.log("postDate is:", postDate);
-                // print whether Apple is in the existing posts
-                let tmpResult = companyDateTuples.has(JSON.stringify([companyName, postDateStr]));
-                console.log("Apple => tmpResult is:", tmpResult);
-            }
         }
 
-        console.log("Eligible posts length is:", eligiblePosts.length);
+        console.log("Eligible posts length is %d for today %s", eligiblePosts.length, new Date().toISOString().split('T')[0]);
     }
 
     return eligiblePosts;
@@ -142,13 +131,20 @@ const getPostPicImageURN = async (companyName) => {
     if (fetchedPhotoUrl) {
         let fileType = fetchedPhotoUrl.split('.').pop(); // get the file type
         let companyLogoExisted = false;
+        let companyNameNoSpace = companyName.replace(/[^a-zA-Z0-9]/g, ''); // remove all special characters
 
         // check if the company logo is found in resource/company folder
-        let companyImageName = `${companyName}.${fileType}`;
+        let companyImageName = `${companyNameNoSpace}.${fileType}`;
         try {
             companyLogoExisted = await fileService.findFileInDirectory(path.resolve(__dirname, `../resource/company/`), companyImageName);
         } catch (error) {
-            console.error("findFileInDirectory error is:", error);
+            console.error("fs.readdirSync error is:", error);
+            return generalImageURN;
+        }
+
+        // if the companyLogoExisted is null, then the company logo is not found, return generalImageURN
+        if (companyLogoExisted === null) {
+            console.log("Company %s logo is not found in resource/company folder", companyName);
             return generalImageURN;
         }
 
@@ -164,7 +160,7 @@ const getPostPicImageURN = async (companyName) => {
             }
 
             // write the imageURN to the ./resource/directory/companyToImageURN.txt
-            fileService.appendCompanyToImageURN(companyName, imageURN);
+            // fileService.appendCompanyToImageURN(companyName, imageURN);
         }
     } else {
         imageURN = generalImageURN;
@@ -190,8 +186,16 @@ const publishPosts = async () => {
 
             if (config.mode === MODE.DEPLOY) {
                 const response = await publishPostAction(postContentObj, imageURN);
-                console.log("Post response status for %s is: %d", companyName, response.status);
+                // if the response is undefined, then the post is not successful, print the error
+                if (response === undefined) {
+                    console.error("Post response is undefined for %s", companyName);
 
+                    // sleep for 60 seconds before making the next post (set by config)
+                    await new Promise(r => setTimeout(r, config.sleepEachPost * 1000));
+                    continue;
+                }
+
+                console.log("Post response status for %s is: %d", companyName, response.status);
                 // if the post is successful, write the company to the supabase database
                 if (response.statusText === "Created") {
                     // write the company to the supabase database
