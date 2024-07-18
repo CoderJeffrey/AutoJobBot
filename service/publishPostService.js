@@ -66,6 +66,10 @@ const getWebScrapeDataAndFilter = async () => {
 const getPostContentList = async () => {
     try {
         const eligibleJobPosts = await getWebScrapeDataAndFilter();
+        if(eligibleJobPosts === null) {
+            console.error("eligibleJobPosts is null. Skipping the post.");
+            return [];
+        }
 
         // create a list of post content with PostContentObj
         const postContentList = [];
