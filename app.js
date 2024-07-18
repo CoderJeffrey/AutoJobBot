@@ -21,14 +21,29 @@ app.listen(PORT, () => {
 const dailyPostHour = process.env.DAILY_POST_HOUR;
 const dailyPostMinute = process.env.DAILY_POST_MINUTE;
 
-cron.schedule(`${dailyPostMinute} ${dailyPostHour} * * *`, async () => {
-    // Print out current exact time
-    console.log('Making a daily post at:', new Date().toISOString());
+// cron schedule to make a post every 3 hours
+let cron_schedule_3_hours = '0 */3 * * *';
+let cron_schedule_daily  = `${dailyPostMinute} ${dailyPostHour} * * *`;
+
+(async () => {
+    // Run the function immediately
+    console.log('Making an immediate post at:', new Date().toISOString());
     try {
         await publishPosts();
     } catch (error) {
-        console.error("Error publishing post:", error);
+        console.error("Error publishing immediate post:", error);
     }
-}, {
-    timezone: "America/Los_Angeles"
-});
+
+    // Schedule the cron job to run every 3 hours
+    cron.schedule(cron_schedule_3_hours, async () => {
+        // Print out current exact time
+        console.log('Making a scheduled post at:', new Date().toISOString());
+        try {
+            await publishPosts();
+        } catch (error) {
+            console.error("Error publishing scheduled post:", error);
+        }
+    }, {
+        timezone: "America/Los_Angeles"
+    });
+})();
