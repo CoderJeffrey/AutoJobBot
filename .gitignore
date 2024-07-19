@@ -71,3 +71,5 @@ build
 
 # all .js files starts with try
 try*.js
+
+/resource
