@@ -1,4 +1,4 @@
-const config = require('../config/config');
+const config = require('../../config/config');
 const axios = require('axios');
 const path = require("path");
 const fs = require("fs");

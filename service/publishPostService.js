@@ -3,8 +3,8 @@ const config = require('../config/config');
 const scrapeWebsite = require('../service/webScrapeService');
 const writePost = require('../helpers/writePostContent');
 const PostContentObj = require('../models/PostContentObj');
-const fetchCompanyLogoService = require('../service/fetchCompanyLogo');
-const uploadPictureService = require('../service/UploadPictureService');
+const fetchCompanyLogoService = require('./CompanyLogo/fetchCompanyLogo');
+const uploadPictureService = require('./CompanyLogo/UploadPictureService');
 const fileService = require('../service/FileSystem/FileService');
 const dbClient = require('../database/dbClient');
 
