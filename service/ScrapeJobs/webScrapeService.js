@@ -127,7 +127,7 @@ const scrapeFullTimeJobs = async () => {
 
         // Wait until the table is loaded
         try {
-            await driver.wait(until.elementLocated(By.css('table tbody tr')), 15000);
+            await driver.wait(until.elementLocated(By.css('table tbody tr')), 30000);
         } catch (e) {
             console.log('Table not found, and error is:', e);
             return;
@@ -221,11 +221,18 @@ const scrapeFullTimeJobs = async () => {
 
 const scrapeAllJobs = async () => {
     let internshipJobs = await scrapeInternshipJobs();
+    if (internshipJobs === null) {
+        console.error("scrapeAllJobs: internshipJobs is null");
+        internshipJobs = [];
+    }
     let fullTimeJobs = await scrapeFullTimeJobs();
+    if (fullTimeJobs === null) {
+        console.error("scrapeAllJobs: fullTimeJobs is null");
+        fullTimeJobs = [];
+    }
 
     // combine two lists into one
     let allJobs = internshipJobs.concat(fullTimeJobs);
-
     return allJobs;
 }
 
