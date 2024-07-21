@@ -1,10 +1,10 @@
 const axios = require('axios');
 const config = require('../config/config');
-const scrapeWebsite = require('../service/webScrapeService');
+const scrapeWebsite = require('./ScrapeJobs/webScrapeService');
 const writePost = require('../helpers/writePostContent');
 const PostContentObj = require('../models/PostContentObj');
-const fetchCompanyLogoService = require('../service/fetchCompanyLogo');
-const uploadPictureService = require('../service/UploadPictureService');
+const fetchCompanyLogoService = require('./CompanyLogo/fetchCompanyLogo');
+const uploadPictureService = require('./CompanyLogo/UploadPictureService');
 const fileService = require('../service/FileSystem/FileService');
 const dbClient = require('../database/dbClient');
 
@@ -25,21 +25,21 @@ const filterPostByExistingPosts = async (jobPosts) => {
     if (existingPosts === null) {
         console.error("Existing posts are null. Skipping the filter.");
     } else if (jobPosts === null) {
-        console.error("Job posts are null. Skipping the filter.");
+        console.error("To be filtered Job posts are null. Skipping the filter.");
     }
-    else {
-        console.log("Existing posts length is:", existingPosts.length);
-        console.log("First existing post is:", existingPosts[0]);
 
-        // fetch the company_name: and date_posted: from the existing posts
+    else {
+        console.log("filterPostByExistingPosts: Existing posts length is:", existingPosts.length);
+
+        // fetch company_name/date_posted/roles tuples from existing posts to filter out the job posts
         companyDateTuples = new Set(existingPosts.map(post => JSON.stringify([post.company_name, post.date_posted, post.role])));
 
         for (let i = 0; i < jobPosts.length; i++) {
             // console.log("filterPostByExistingPosts) i is:", i);
             let companyName = jobPosts[i].company;
-            let postDate = jobPosts[i].postDate;
-            let postRole = jobPosts[i].jobTitle;
             let postDateStr = jobPosts[i].postDate.toISOString().split('T')[0];
+            let postRole = jobPosts[i].jobTitle;
+
             // if the tuple of [companyName, postDate] is not in the existing posts, add it to the eligible posts
             if (!companyDateTuples.has(JSON.stringify([companyName, postDateStr, postRole]))) {
                 eligiblePosts.push(jobPosts[i]);
@@ -54,7 +54,7 @@ const filterPostByExistingPosts = async (jobPosts) => {
 
 const getWebScrapeDataAndFilter = async () => {
     try {
-        const jobPosts = await scrapeWebsite.scrape();
+        const jobPosts = await scrapeWebsite.scrapeAllJobs();
         // filter the job posts by today's date
         const filteredPosts = filterPostByExistingPosts(jobPosts);
         return filteredPosts;
@@ -183,10 +183,10 @@ const publishPosts = async () => {
             let postContentObj = postContentList[i];
             let jobPost = postContentObj.jobPost;
             let companyName = jobPost.company;
+            const imageURN = await getPostPicImageURN(companyName);
 
             console.log("Company name %d is: %s", i, companyName);
             console.log("Post content %d is: %s", i, postContentObj.postContent);
-            const imageURN = await getPostPicImageURN(companyName);
 
             if (config.mode === MODE.DEPLOY) {
                 const response = await publishPostAction(postContentObj, imageURN);

@@ -1,7 +1,7 @@
 const axios = require('axios');
-const config = require('../config/config');
-const scrapeWebsite = require('../service/webScrapeService');
-const writePost = require('../helpers/writePostContent');
+const config = require('../../config/config');
+const scrapeWebsite = require('../ScrapeJobs/webScrapeService');
+const writePost = require('../../helpers/writePostContent');
 const fs = require('fs');
 const formData = require('form-data');
 
