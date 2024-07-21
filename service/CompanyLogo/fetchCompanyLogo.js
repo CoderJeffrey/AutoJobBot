@@ -35,7 +35,7 @@ const downloadPhotoToLocal = async (photoUrl, companyName) => {
         // companyName = "testWellsFargo";
 
         // store the image in current directory
-        let filePath = path.resolve(__dirname, `../resource/company/${companyName}.${fileType}`);
+        let filePath = path.resolve(__dirname, `../../resource/company/${companyName}.${fileType}`);
 
         // download and save the file
         await downloadAndSaveFile(response, filePath);
