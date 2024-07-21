@@ -11,6 +11,12 @@ const initializeWebDriver = async () => {
     let options = new chrome.Options();
     options.addArguments('--headless'); // Run Chrome in headless mode
     options.addArguments('--no-sandbox');
+    options.addArguments('--disable-gpu');
+    options.addArguments('--disable-dev-shm-usage'); // Overcome limited resource problems
+    options.addArguments('--disable-software-rasterizer'); // Disable software rasterizer
+    options.addArguments('--disable-extensions'); // Disable extensions
+    options.addArguments('--disable-background-networking'); // Disable background networking
+    options.addArguments('--disable-default-apps'); // Disable default apps
 
     let driver = await new Builder().forBrowser('chrome').setChromeOptions(options).build();
     return driver;
