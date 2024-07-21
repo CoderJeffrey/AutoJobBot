@@ -3,7 +3,7 @@ function writePostContent(jobPost) {
     let isSponsored = jobPost.sponsorship;
     const postContent = `
 ${jobPost.company} just released its ${jobPost.jobTitle} now 🚀
-${isSponsored ? '🛂 Visa Sponsorship Available' : '🚫 Visa Sponsorship Not Available'} 
+${isSponsored ? 'Visa Sponsorship Available 🛂' : 'Visa Sponsorship Not Available 🚫'} 
 Link Below to Apply 👇️
 
 Application Link: ${jobPost.jobLink}  
