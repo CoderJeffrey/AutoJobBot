@@ -5,7 +5,7 @@ const path = require('path');
 const { DateStrToDateObj } = require('../../helpers/time');
 
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
-const tmp_numJobEntriesNum = 30;
+// const tmp_numJobEntriesNum = 30;
 
 const initializeWebDriver = async () => {
     let options = new chrome.Options();
@@ -27,7 +27,7 @@ const scrapeInternshipJobs = async () => {
         try {
             await driver.wait(until.elementLocated(By.css('table tbody tr')), 15000);
         } catch (e) {
-            console.log('Table not found.');
+            console.error('Table not found, and error is:', e);
             return;
         }
 
@@ -55,16 +55,14 @@ const scrapeInternshipJobs = async () => {
             try {
                 cells = await row.findElements(By.css('td'));
             } catch (e) {
-                console.log(`Skipping job post at row ${i + 1} due to missing cells.`);
+                console.log(`Skipping job post at row ${i + 1} due to missing cells with error:`, e);
                 break; // break out of the loop if there are no cells
             }
-
-            let totalCells = cells.length;
 
             // skip nested companies (↳)
             let company = await cells[0].getText();
             if (company === "↳") {
-                console.log(`Skipping job post at row ${i + 1} due to nested company.`);
+                console.log(`Skipping job post at row ${i + 1} due to nested company`);
                 continue;
             }
 
@@ -82,7 +80,7 @@ const scrapeInternshipJobs = async () => {
             try {
                 joblink = await cells[3].findElement(By.css('a')).getAttribute('href');
             } catch (e) {
-                console.log(`Skipping job post at row ${i + 1} for company ${company} due to missing job link.`);
+                console.log(`Skipping job post at row ${i + 1} for company ${company} due to missing job link with error:`, e);
                 continue; // Skip this iteration if the job link is undefined
             }
 
@@ -131,7 +129,7 @@ const scrapeFullTimeJobs = async () => {
         try {
             await driver.wait(until.elementLocated(By.css('table tbody tr')), 15000);
         } catch (e) {
-            console.log('Table not found.');
+            console.log('Table not found, and error is:', e);
             return;
         }
 
@@ -161,11 +159,9 @@ const scrapeFullTimeJobs = async () => {
             try {
                 cells = await row.findElements(By.css('td'));
             } catch (e) {
-                console.log(`Skipping job post at row ${i + 1} due to missing cells.`);
+                console.log(`Skipping job post at row ${i + 1} due to missing cells and error:`, e);
                 break; // break out of the loop if there are no cells
             }
-
-            let totalCells = cells.length;
 
             // skip nested companies (↳)
             let company = await cells[0].getText();
@@ -179,6 +175,9 @@ const scrapeFullTimeJobs = async () => {
             let sponsorship = true;
             if (jobTitle.includes('🛂') || jobTitle.includes('🇺🇸')) {
                 sponsorship = false;
+
+                // also remove the 🛂 or 🇺🇸 from the job title
+                jobTitle = jobTitle.replace('🛂', '').replace('🇺🇸', '');
             }
 
             let jobLocation = await cells[2].getText();
@@ -188,7 +187,7 @@ const scrapeFullTimeJobs = async () => {
             try {
                 joblink = await cells[3].findElement(By.css('a')).getAttribute('href');
             } catch (e) {
-                console.log(`Skipping job post at row ${i + 1} for company ${company} due to missing job link.`);
+                console.log(`Skipping job post at row ${i + 1} for company ${company} due to missing job link with error:`, e);
                 continue; // Skip this iteration if the job link is undefined
             }
 
