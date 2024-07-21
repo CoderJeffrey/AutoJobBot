@@ -40,7 +40,7 @@ const uploadPicture = async (uploadUrl, imageName) => {
         }
 
         // use FormData to read the image file
-        const filePath = path.resolve(__dirname, `../resource/company/${imageName}`);
+        const filePath = path.resolve(__dirname, `../../resource/company/${imageName}`);
         const form_data = new formData();
         form_data.append('file', fs.createReadStream(filePath));
 
@@ -102,7 +102,7 @@ const fetchPicture = async (imageUrn, imageName) => {
 
         // console.log("Image data:", image.data);
         // store the image in current directory
-        let filePath = path.resolve(__dirname, `../resource/downloaded/${imageName}`);
+        let filePath = path.resolve(__dirname, `../../resource/downloaded/${imageName}`);
         image.data.pipe(fs.createWriteStream(filePath));
         console.log("Downloaded image is stored in:", filePath);
     } catch (error) {
