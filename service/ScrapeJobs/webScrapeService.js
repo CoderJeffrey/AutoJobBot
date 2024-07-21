@@ -46,10 +46,7 @@ const scrapeInternshipJobs = async () => {
         console.log('Total Rows Length:', totalRows);
 
         let jobPosts = [];
-        let numJobPostsToCrawl = config.jobEntriesNum;
-
-        // change to int
-        numJobPostsToCrawl = parseInt(numJobPostsToCrawl);
+        let numJobPostsToCrawl = parseInt(config.jobEntriesNum);
 
         // loop through the first 10 rows
         for (let i = 0; i < numJobPostsToCrawl; i++) {
@@ -155,7 +152,7 @@ const scrapeFullTimeJobs = async () => {
         let jobPosts = [];
 
         // TODO: replaced with config.jobEntriesNum
-        let numJobPostsToCrawl = parseInt(process.env.JOB_ENTRIES_NUM);
+        let numJobPostsToCrawl = parseInt(config.jobEntriesNum);
 
         // loop through the first 10 rows
         for (let i = 0; i < numJobPostsToCrawl; i++) {
