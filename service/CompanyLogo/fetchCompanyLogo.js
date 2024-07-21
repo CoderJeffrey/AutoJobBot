@@ -3,8 +3,7 @@ const axios = require('axios');
 const path = require("path");
 const fs = require("fs");
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
-const accessToken = process.env.ACCESS_TOKEN;
-const logo_api_key = process.env.LOGO_API_KEY;
+const logo_api_key = config.logoAPIKey;
 
 const fetchPhoto = async (companyName) => {
     // fetch company logo from https://api.api-ninjas.com/v1/logo?name=Microsoft

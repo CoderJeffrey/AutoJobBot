@@ -1,15 +1,12 @@
 // writePostContent.js
 function writePostContent(jobPost) {
-    const postYear = jobPost.postDate.getUTCFullYear();
-    const postMonth = jobPost.postDate.getUTCMonth() + 1;
-    const postDay = jobPost.postDate.getUTCDate();
-
+    let isSponsored = jobPost.sponsorship;
     const postContent = `
-Want to earn $10K+/month next summer? 🤔️
+${jobPost.company} just released its ${jobPost.jobTitle} now 🚀
+${isSponsored ? '🛂 Visa Sponsorship Available' : '🚫 Visa Sponsorship Not Available'} 
+Link Below to Apply 👇️
 
-Apply to ${jobPost.company}'s ${jobPost.jobTitle} now
 Application Link: ${jobPost.jobLink}  
-
 ➡️ Follow for more updates like this!
 ↘️ Drop your email below and I will send you Resume Templates that get me into Amazon, LinkedIn and Google! 🚀️
 ⬇️ Or I get lazy and forget to send 😂️
@@ -19,20 +16,4 @@ Application Link: ${jobPost.jobLink}
     return postContent;
 }
 
-function writeArticleSource(jobPost) {
-    const articleSource = `${jobPost.jobLink}`;
-    return articleSource;
-}
-
-const writeArticleTitle = (jobPost) => {
-    const articleTitle = `${jobPost.company}`;
-    return articleTitle;
-}
-
-const writeArticleDescription = (jobPost) => {
-    const articleDescription = `${jobPost.jobTitle}`;
-    return articleDescription;
-}
-
-
-module.exports = { writePostContent , writeArticleSource, writeArticleTitle, writeArticleDescription };
+module.exports = { writePostContent};
