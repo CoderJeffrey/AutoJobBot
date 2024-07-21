@@ -25,7 +25,7 @@ const scrapeInternshipJobs = async () => {
 
         // Wait until the table is loaded
         try {
-            await driver.wait(until.elementLocated(By.css('table tbody tr')), 15000);
+            await driver.wait(until.elementLocated(By.css('table tbody tr')), 30000);
         } catch (e) {
             console.error('Table not found, and error is:', e);
             return;
