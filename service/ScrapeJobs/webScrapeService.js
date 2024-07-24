@@ -34,7 +34,7 @@ const initializeWebDriver = async () => {
 
     let driver = await new Builder()
         .forBrowser('firefox')
-        .setChromeOptions(options).build();
+        .setFirefoxOptions(options).build();
     return driver;
 }
 const scrapeInternshipJobs = async () => {
