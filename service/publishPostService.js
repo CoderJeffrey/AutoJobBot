@@ -7,6 +7,7 @@ const fetchCompanyLogoService = require('./CompanyLogo/fetchCompanyLogo');
 const uploadPictureService = require('./CompanyLogo/UploadPictureService');
 const fileService = require('../service/FileSystem/FileService');
 const dbClient = require('../database/dbClient');
+require('chromedriver');
 
 const accessToken = config.accessToken;
 const generalImageURN = "urn:li:image:D5610AQHcMPlxJnPyJA";
