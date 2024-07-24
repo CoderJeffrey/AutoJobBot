@@ -7,7 +7,19 @@ const { DateStrToDateObj } = require('../../helpers/time');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 // const tmp_numJobEntriesNum = 30;
 
+const updateWebDriverManager = async () => {
+    try {
+        // Update webdriver-manager to get the latest ChromeDriver
+        await exec('npx webdriver-manager update --standalone false --gecko false --versions.chrome latest');
+    } catch (error) {
+        console.error('Error updating WebDriver Manager:', error);
+    }
+};
+
 const initializeWebDriver = async () => {
+    // Update the WebDriver Manager
+    await updateWebDriverManager();
+
     let options = new chrome.Options();
     options.addArguments('--headless'); // Run Chrome in headless mode
     options.addArguments('--no-sandbox');
