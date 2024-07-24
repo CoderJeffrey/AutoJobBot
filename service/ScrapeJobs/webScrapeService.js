@@ -1,6 +1,6 @@
 const { Builder, By, until } = require('selenium-webdriver');
 const config = require('../../config/config');
-const chrome = require('selenium-webdriver/chrome');
+const firefox = require('selenium-webdriver/firefox');
 const path = require('path');
 const { DateStrToDateObj } = require('../../helpers/time');
 const { exec } = require('child_process');
@@ -11,7 +11,8 @@ require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 const updateWebDriverManager = async () => {
     try {
         // Update webdriver-manager to get the latest ChromeDriver
-        await exec('npx webdriver-manager update --standalone false --gecko false --versions.chrome latest');
+        const result = await exec('webdriver-manager update');
+        // console.log('WebDriver Manager updated:', result);
     } catch (error) {
         console.error('Error updating WebDriver Manager:', error);
     }
@@ -21,8 +22,8 @@ const initializeWebDriver = async () => {
     // Update the WebDriver Manager
     await updateWebDriverManager();
 
-    let options = new chrome.Options();
-    options.addArguments('--headless'); // Run Chrome in headless mode
+    let options = new firefox.Options();
+    options.addArguments('--headless'); // Run firefox in headless mode
     options.addArguments('--no-sandbox');
     options.addArguments('--disable-gpu');
     options.addArguments('--disable-dev-shm-usage'); // Overcome limited resource problems
@@ -31,7 +32,9 @@ const initializeWebDriver = async () => {
     options.addArguments('--disable-background-networking'); // Disable background networking
     options.addArguments('--disable-default-apps'); // Disable default apps
 
-    let driver = await new Builder().forBrowser('chrome').setChromeOptions(options).build();
+    let driver = await new Builder()
+        .forBrowser('firefox')
+        .setChromeOptions(options).build();
     return driver;
 }
 const scrapeInternshipJobs = async () => {
