@@ -3,6 +3,7 @@ const config = require('../../config/config');
 const chrome = require('selenium-webdriver/chrome');
 const path = require('path');
 const { DateStrToDateObj } = require('../../helpers/time');
+const { exec } = require('child_process');
 
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 // const tmp_numJobEntriesNum = 30;
