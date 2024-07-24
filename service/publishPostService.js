@@ -204,7 +204,7 @@ const publishPosts = async () => {
                 // if the post is successful, write the company to the supabase database
                 if (response.statusText === "Created") {
                     // write the company to the supabase database
-                    let postedResult = dbClient.connectToSupabaseAndPostJob(postContentObj.jobPost);
+                    let postedResult = await dbClient.connectToSupabaseAndPostJob(postContentObj.jobPost);
                     console.log("Response for db PostJob for %s is:", companyName, postedResult);
                 }
             }
