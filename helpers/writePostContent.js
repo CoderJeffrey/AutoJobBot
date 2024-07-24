@@ -1,8 +1,11 @@
 // writePostContent.js
 function writePostContent(jobPost) {
     let isSponsored = jobPost.sponsorship;
+    // replace all non-alphanumeric characters with empty string except for spaces and remove leading and trailing spaces
+    let filteredJobTitle = jobPost.jobTitle.replace(/[^a-zA-Z0-9 ]/g, '').trim();
+
     const postContent = `
-${jobPost.company} just released its ${jobPost.jobTitle} now 🚀
+${jobPost.company} just released its ${filteredJobTitle} now 🚀
 ${isSponsored ? 'Visa Sponsorship Available 🛂' : 'Visa Sponsorship Not Available 🚫'} 
 Link Below to Apply 👇️
 
