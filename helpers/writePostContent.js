@@ -5,8 +5,8 @@ function writePostContent(jobPost) {
     let filteredJobTitle = jobPost.jobTitle.replace(/[^a-zA-Z0-9 ]/g, '').trim();
 
     const postContent = `
-${jobPost.company} just released its ${filteredJobTitle} now 🚀
-${isSponsored ? 'Visa Sponsorship Available 🛂' : 'Visa Sponsorship Not Available 🚫'} 
+${jobPost.company} just released its ${filteredJobTitle} 🚀
+${isSponsored ? 'Visa Sponsorship Available ✅' : 'Visa Sponsorship Not Available 🚫'} 
 Link Below to Apply 👇️
 
 Application Link: ${jobPost.jobLink}  
