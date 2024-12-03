@@ -96,6 +96,7 @@ const getPostContentList = async () => {
 // the action to publish a post
 const publishPostAction = async (postContentObj, imageURN) => {
     try {
+        console.log("postContentObj.postContent is:", postContentObj.postContent);
         const response = await axios.post('https://api.linkedin.com/rest/posts',
             {
                 "author": "urn:li:person:QMGpV_X3Ej",
