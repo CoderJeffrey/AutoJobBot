@@ -15,7 +15,6 @@ Application Link: ${jobPost.jobLink}
 ⬇️ Or I get lazy and forget to send 😂️
 #JobAlert #${jobPost.company} #Internship #NewGrad
 `;
-
     return postContent;
 }
 

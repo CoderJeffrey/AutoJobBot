@@ -101,6 +101,9 @@ const scrapeInternshipJobs = async () => {
             let joblink;
             try {
                 joblink = await cells[3].findElement(By.css('a')).getAttribute('href');
+                // escape underscore in the joblink
+                joblink = joblink.replace(/_/g, '%5F');
+                console.log('UPDATED joblink is:', joblink);
             } catch (e) {
                 console.log(`Skipping job post at row ${i + 1} for company ${company} due to missing job link with error:`, e);
                 continue; // Skip this iteration if the job link is undefined
